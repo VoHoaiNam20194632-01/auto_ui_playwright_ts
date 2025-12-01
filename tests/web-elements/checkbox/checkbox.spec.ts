@@ -9,49 +9,27 @@ for (let textCheckBox of textCheckBoxs) {
         //xpathLocator check box
         //label[normalize-space(.)="Apple"]//span[contains(concat(' ',normalize-space(@class),' '),' ant-checkbox ')]
         for(let text of textCheckBoxs){
-            await unClickCheckboxByLabel(text,page);
+            await selectCheckboxByLabel(text,false,page);
         }
         
-        await clickCheckboxByLabel(textCheckBox,page);
+        await selectCheckboxByLabel(textCheckBox,true,page);
         // await
         await expect(page.getByText(`Selected values: ${textCheckBox}`))
             .toBeVisible();
     })
 }
 
-async function clickCheckboxByLabel(label: string, page: Page) {
+async function selectCheckboxByLabel(label: string, check : boolean, page: Page) {
     let xpathCheckBox = `//label[normalize-space(.)="${label}"]//span[contains(concat(' ',normalize-space(@class),' '),' ant-checkbox ')]`
     // check checkbox checked
     let classCheckbox = await page.locator(xpathCheckBox).getAttribute("class");
-    let currentStatus = classCheckbox?.match("ant-checkbox-checked")?.length ?? 0;
-    let checkChecked: boolean = currentStatus > 0;
+    // let currentStatus = classCheckbox?.match("ant-checkbox-checked")?.length ?? 0;
+    let checkChecked = classCheckbox?.split(" ").includes("ant-checkbox-checked");
     // click checkbox 
-    if (!checkChecked) {
+    if ((!checkChecked && check) || (checkChecked && !check)) {
         let xpathLabel = `//label[normalize-space(.)="${label}" and .//input[@type="checkbox"]]`;
         await page.locator(xpathLabel).click();
     }
-}
-
-async function unClickCheckboxByLabel(label: string, page: Page) {
-    let xpathCheckBox = `//label[normalize-space(.)="${label}"]//span[contains(concat(' ',normalize-space(@class),' '),' ant-checkbox ')]`
-    // check checkbox checked
-    let classCheckbox = await page.locator(xpathCheckBox).getAttribute("class");
-    let currentStatus = classCheckbox?.match("ant-checkbox-checked")?.length ?? 0;
-    let checkChecked: boolean = currentStatus > 0;
-    // click checkbox 
-    if (checkChecked) {
-        let xpathLabel = `//label[normalize-space(.)="${label}" and .//input[@type="checkbox"]]`;
-        await page.locator(xpathLabel).click();
-    }
-}
-
-async function checkboxedByLabel(label: string, page: Page): Promise<boolean> {
-    let xpathCheckBox = `//label[normalize-space(.)="${label}"]//span[contains(concat(' ',normalize-space(@class),' '),' ant-checkbox ')]`
-    // check checkbox checked
-    let classCheckbox = await page.locator(xpathCheckBox).getAttribute("class");
-    let currentStatus = classCheckbox?.match("ant-checkbox-checked")?.length ?? 0;
-    let checkChecked: boolean = currentStatus > 0;
-    return checkChecked
 }
 
 
