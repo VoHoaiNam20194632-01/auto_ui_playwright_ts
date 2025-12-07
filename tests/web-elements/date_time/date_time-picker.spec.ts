@@ -88,5 +88,57 @@ async function selectDateByLabel(label: string, year: number, month: string, day
 
 
 test(`Verify Date Range Picker`, async({page})=>{
-    
+    await page.goto("https://test-with-me-app.vercel.app/learning/web-elements/elements/date-time");
+    //(//div[.//span[normalize-space(text())="Date Picker"] and @role="separator"]/following::div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-input ')])[1]//input
+    let inputXpath = `(//div[.//span[normalize-space(text())="Date Range Picker"] and @role="separator"]/following::div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-input ')])[1]//input`;
+    await page.locator(inputXpath).click();
+    await selectRangeDateByLabel('Start date', 1979, 'May', '1', page);
+    await selectRangeDateByLabel('End date', 2025, 'May', '1', page);
+    await page.keyboard.press('Enter');
+    await expect(page.getByText(`Current date range: 1979-05-01 - 2025-06-01`)).toBeVisible();
 })
+ 
+async function selectRangeDateByLabel(type:string, year:number, month:string,day:string,page:Page) {
+    let divPickerPanelStartDate = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-panels ')]//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-panel ')][1]`;
+    let divPickerPanelEndDate = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-panels ')]//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-panel ')][2]`;
+    let yearHeaderXpath='';
+    if(type === 'Start date'){
+        yearHeaderXpath = divPickerPanelStartDate + `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header-view ')]//button[@aria-label="year panel"]`;
+    }else if(type === 'End date'){
+        yearHeaderXpath = divPickerPanelEndDate + `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header-view ')]//button[@aria-label="year panel"]`;
+    }
+    //div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header-view ')]//button[@aria-label="year panel"]
+    await page.locator(yearHeaderXpath).click();
+    //div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header-view ')]//button
+    let yearRangeXpath = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header-view ')]//button`;
+    let yearRangeText = await page.locator(yearRangeXpath).textContent();
+    let minYear = Number.parseInt(yearRangeText?.trim().split('-')[0] ?? '');
+    let maxYear = Number.parseInt(yearRangeText?.trim().split('-')[1] ?? '');
+    let startYear = Math.floor(year / 10) * 10;
+    let endYear = startYear + 9;
+    let yearXpath = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-body ')]//td[.//div[normalize-space(text())="${year}"]]`;
+    let clickCount;
+    if (year < minYear) {
+        clickCount = Math.floor((minYear - startYear) / (maxYear - minYear + 1));
+        let backButtonXpath = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header ')]//button[@aria-label="super-prev-year"]`;
+        for (let i = 0; i < clickCount; i++) {
+            await page.locator(backButtonXpath).click();
+        }
+    } else if (maxYear < year) {
+        clickCount = Math.floor((endYear - maxYear) / (maxYear - minYear + 1));
+        let nextButtonXpath = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-header ')]//button[@aria-label="super-next-year"]`;
+        for (let i = 0; i < clickCount; i++) {
+            await page.locator(nextButtonXpath).click();
+        }
+    }
+    await page.locator(yearXpath).click();
+    let monthXpath = `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-body ')]//td[.//div[normalize-space(text())="${month}"]]`;
+    await page.locator(monthXpath).click();
+    let dateXpath = '';
+    if(type === 'Start date'){
+        dateXpath = divPickerPanelStartDate + `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-body ')]//td[.//div[normalize-space(text())="${day}"] and contains(@class,'ant-picker-cell-in-view')]`;
+    }else if(type === 'End date'){
+        dateXpath = divPickerPanelEndDate + `//div[contains(concat(' ',normalize-space(@class),' '),' ant-picker-body ')]//td[.//div[normalize-space(text())="${day}"] and contains(@class,'ant-picker-cell-in-view')]`;
+    }
+    await page.locator(dateXpath).click();
+}
