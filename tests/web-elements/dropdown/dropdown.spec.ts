@@ -7,8 +7,7 @@ test(`Verify Dropdown ${textDropdown}`, async({page})=>{
     await page.locator(xpathDropdown).hover();
     let xpathItemDropdown = `//li[.//span[normalize-space(text())='${textDropdown}']]`
     await page.locator(xpathItemDropdown).click();
-    let xpathValue = "//div[contains(text(), 'Value:')]//span";
     let xpathValueButton = `//button[.//span[normalize-space(text())="${textDropdown}"]]`
-    expect(page.locator(xpathValue).getByText(`${textDropdown}`)).toBeVisible();
+    expect(page.getByText(`Value: ${textDropdown}`)).toBeVisible();
     expect(page.locator(xpathValueButton)).toBeVisible();
 })}
