@@ -4,11 +4,34 @@ import { expectedTableData } from "./table-test-data";
 test(`Verify table`, async ({ page }) => {
     await page.goto(
         "https://test-with-me-app.vercel.app/learning/web-elements/components/table");
-    let tableData = await getDataTableByTableName('Table',['Name', 'Age','Address','Tags','Action' ], page);
+    let tableData = await getDataTableByTableName('Table',['Name', 'Age','Address','Tags'], page);
     console.log("data Table:", JSON.stringify(tableData, null, 2));
-    // expect(tableData).toEqual(expect.arrayContaining(expectedTableData));
-    // expect(expectedTableData).toEqual(expect.arrayContaining(tableData));
+    expect(sortJson(tableData)).toMatchObject(sortJson(expectedTableData));
 });
+
+function sortJson(value: any): any {
+    // Array → sort values
+    if (Array.isArray(value)) {
+        return value
+            .map(sortJson)
+            .sort((a, b) => {
+                return JSON.stringify(a).localeCompare(JSON.stringify(b));
+            });
+    }
+
+    // Object → sort keys
+    if (value !== null && typeof value === "object") {
+        const sorted: { [key: string]: any } = {};
+        Object.keys(value)
+            .sort()
+            .forEach(key => {
+                sorted[key] = sortJson(value[key]);
+            });
+        return sorted;
+    }
+
+    return value;
+}
 
 async function getDataTableByTableName(nameTable:string,expectHeaders:string[], page:Page) {
     let tableXpath =`(//div[.//span[normalize-space(text())="${nameTable}"] and @role="separator"]/following::table)[1]`
@@ -39,6 +62,7 @@ async function getDataTableByTableName(nameTable:string,expectHeaders:string[], 
     let isNextButtonDisabled = 'false';
     console.log("isNextButtonDisabled: " + isNextButtonDisabled)
     while('false' == isNextButtonDisabled){
+        await page.waitForTimeout(1000);
         let rowXpath = `//tbody[contains(concat(' ',normalize-space(@class),' '),' ant-table-tbody ')]//tr`;
         let rows = await tableLocator.locator(rowXpath).all();
         for(let row of rows){

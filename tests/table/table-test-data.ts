@@ -18,8 +18,8 @@ export const expectedTableData = [
     },
     {
         "Tags": [
-            "COOL",
-            "TEACHER"
+            "TEACHER",
+            "COOL"
         ],
         "Address": "Sidney No. 1 Lake Park",
         "Age": "32",
@@ -36,8 +36,8 @@ export const expectedTableData = [
     },
     {
         "Tags": [
-            "COOL",
-            "TEACHER"
+            "TEACHER",
+            "COOL"
         ],
         "Address": "London No. 3 Lake Park",
         "Age": "32",
