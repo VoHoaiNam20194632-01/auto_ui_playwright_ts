@@ -1,42 +1,28 @@
 import { test, expect, Page } from "@playwright/test";
 import { invalidLogin } from "../../../data/login/login-data";
+import { LoginPage } from "../../../model/pages/login-page";
+
+let loginPage: LoginPage
+test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await page.goto("http://localhost:3000/admin/login");
+})
 
 test("Verify admin login successful", async ({ page }) => {
-    await page.goto("http://localhost:3000/admin/login");
-
-    await inputTextBoxByLabel('Email', 'test@with.me', page);
-    await inputTextBoxByLabel('Password', '24081201Nam@', page);
-    await clickButtonByLabel('SIGN IN', page)
-    await expect(page.locator('.page-heading-title')).toHaveText('Dashboard');
+    await loginPage.adminLogin();
 });
 for (let data of invalidLogin) {
     test(data.testCaseName, async ({ page }) => {
-        await page.goto("http://localhost:3000/admin/login");
         for (let field in data.input) {
             //@ts-ignore
-            await inputTextBoxByLabel(field, data.input[`${field}`], page);
+            await loginPage.inputTextBoxByLabel(field, data.input[`${field}`]);
         }
 
-        await clickButtonByLabel('SIGN IN', page)
+        await loginPage.clickButtonByLabel('SIGN IN')
 
         for (let field in data.expect) {
             //@ts-ignore
-            await verifyValidationMessageByLabel(field, data.expect[`${field}`], page);
+            await loginPage.verifyValidationMessageByLabel(field, data.expect[`${field}`]);
         }
     });
-}
-
-async function verifyValidationMessageByLabel(label:string, message:string, page:Page) {
-    let messageXpath = `(//label[normalize-space(text())="${label}"]//following::p[normalize-space()="${message}" and contains(concat(' ',normalize-space(@class),' '),' field-error ')])[1]`;
-    await expect(page.locator(messageXpath)).toBeVisible();
-}
-
-async function inputTextBoxByLabel(label: string, input: string, page: Page) {
-    let inputXpath = `(//label[normalize-space(text())="${label}"]//following::input)[1]`
-    await page.locator(inputXpath).fill(input);
-}
-
-async function clickButtonByLabel(label: string, page: Page) {
-    let buttonXpath = `//button[normalize-space()="${label}"]`;
-    await page.locator(buttonXpath).click();
 }
