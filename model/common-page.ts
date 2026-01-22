@@ -71,7 +71,7 @@ export class CommonPage {
         return cookiesHeader;
     }
 
-    async deleteProductByApi(productId: string, cookiesHeader:string) {
+    async deleteProductByApi(productId: string, cookiesHeader: string) {
         let url = `http://localhost:3000/api/products/${productId}`;
         // cookiesHeader = await this.builCookieHeader();
         let myRequest = await request.newContext();
@@ -82,4 +82,13 @@ export class CommonPage {
         });
     }
 
+    async createProductByApi(requestBody: any, cookieHeader: string) {
+        let myRequest = await request.newContext();
+        return await myRequest.post("http://localhost:3000/api/products", {
+            headers: {
+                Cookie: cookieHeader
+            },
+            data: requestBody
+        })
+    }
 }

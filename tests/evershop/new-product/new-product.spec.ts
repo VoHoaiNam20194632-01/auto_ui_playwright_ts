@@ -11,7 +11,7 @@ let dashboardPage: DashboardPage
 let productsPage: ProductsPage
 let editProductPage: EditProductPage
 let productIds: string[] = [];
-let cookieHeader:string
+let cookieHeader: string
 test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     newProductPage = new NewProductPage(page);
@@ -24,8 +24,8 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.afterAll(async ({ request }) => {
-    for(let productId of productIds){
-    await editProductPage.deleteProductByApi(productId,cookieHeader);
+    for (let productId of productIds) {
+        await editProductPage.deleteProductByApi(productId, cookieHeader);
     }
 })
 
@@ -60,6 +60,6 @@ test("Verify create new product", async ({ page, request }) => {
     await productsPage.selectProductByName(productName);
     await editProductPage.isDisplay(`Editing ${productName}`);
     await expect(await editProductPage.getFieldValueByLabel('Product Name')).toEqual(productName);
-    let productId =  editProductPage.getProductId();
+    let productId = editProductPage.getProductId();
     productIds.push(productId)
 });
