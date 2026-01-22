@@ -10,7 +10,8 @@ let newProductPage: NewProductPage
 let dashboardPage: DashboardPage
 let productsPage: ProductsPage
 let editProductPage: EditProductPage
-let productId: string;
+let productIds: string[] = [];
+let cookieHeader:string
 test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     newProductPage = new NewProductPage(page);
@@ -19,10 +20,13 @@ test.beforeEach(async ({ page }) => {
     editProductPage = new EditProductPage(page);
     await page.goto("http://localhost:3000/admin/login");
     await loginPage.adminLogin();
+    cookieHeader = await loginPage.builCookieHeader();
 })
 
-test.afterEach(async ({ page }) => {
-    await editProductPage.deleteProductByApi(productId);
+test.afterAll(async ({ request }) => {
+    for(let productId of productIds){
+    await editProductPage.deleteProductByApi(productId,cookieHeader);
+    }
 })
 
 test("Verify create new product", async ({ page, request }) => {
@@ -49,7 +53,6 @@ test("Verify create new product", async ({ page, request }) => {
     await newProductPage.uploadImage('data/new-product/image/DSC_4950.jpg');
     await newProductPage.inputTextAreaByLabel('Meta Description', 'Meta Description');
     await newProductPage.clickButtonByLabel('Save');
-    await page.waitForTimeout(1000);
     await newProductPage.verifyPopupMessage('Product created successfully');
     await newProductPage.clickMenuByLabel('Products');
     productsPage.isDisplay();
@@ -57,5 +60,6 @@ test("Verify create new product", async ({ page, request }) => {
     await productsPage.selectProductByName(productName);
     await editProductPage.isDisplay(`Editing ${productName}`);
     await expect(await editProductPage.getFieldValueByLabel('Product Name')).toEqual(productName);
-    productId = editProductPage.getProductId();
+    let productId =  editProductPage.getProductId();
+    productIds.push(productId)
 });
