@@ -1,4 +1,5 @@
 import { expect, Page, request } from "@playwright/test";
+import { UI_BASE_URL } from "./utils/constants-utils";
 export class CommonPage {
     page: Page;
     constructor(page: Page) {
@@ -72,7 +73,7 @@ export class CommonPage {
     }
 
     async deleteProductByApi(productId: string, cookiesHeader: string) {
-        let url = `http://localhost:3000/api/products/${productId}`;
+        let url = `${UI_BASE_URL}/api/products/${productId}`;
         // cookiesHeader = await this.builCookieHeader();
         let myRequest = await request.newContext();
         await myRequest.delete(url, {

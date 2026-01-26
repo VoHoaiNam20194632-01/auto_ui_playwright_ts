@@ -4,6 +4,7 @@ import { NewProductPage } from "../../../model/pages/new-product-page";
 import { DashboardPage } from "../../../model/pages/dashboard-page";
 import { ProductsPage } from "../../../model/pages/products-page";
 import { EditProductPage } from "../../../model/pages/edit-product-page";
+import { UI_ADMIN_LOGIN_URL } from "../../../model/utils/constants-utils";
 
 let loginPage: LoginPage;
 let newProductPage: NewProductPage
@@ -18,7 +19,7 @@ test.beforeEach(async ({ page }) => {
     dashboardPage = new DashboardPage(page);
     productsPage = new ProductsPage(page);
     editProductPage = new EditProductPage(page);
-    await page.goto("http://localhost:3000/admin/login");
+    await page.goto(UI_ADMIN_LOGIN_URL);
     await loginPage.adminLogin();
     cookieHeader = await loginPage.builCookieHeader();
 })
