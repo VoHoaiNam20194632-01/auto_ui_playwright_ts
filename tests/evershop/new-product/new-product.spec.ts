@@ -5,6 +5,7 @@ import { DashboardPage } from "../../../model/pages/dashboard-page";
 import { ProductsPage } from "../../../model/pages/products-page";
 import { EditProductPage } from "../../../model/pages/edit-product-page";
 import { UI_ADMIN_LOGIN_URL } from "../../../model/utils/constants-utils";
+import * as allure from "allure-js-commons";
 
 let loginPage: LoginPage;
 let newProductPage: NewProductPage

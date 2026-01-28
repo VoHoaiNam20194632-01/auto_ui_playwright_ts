@@ -6,6 +6,8 @@ import { ProductsPage } from "../../../model/pages/products-page";
 import { EditProductPage } from "../../../model/pages/edit-product-page";
 import { newProductBodyTemplate } from "../../../data/edit-product/edit-product";
 import { UI_ADMIN_LOGIN_URL } from "../../../model/utils/constants-utils";
+import * as allure from "allure-js-commons";
+import { iStep } from "../../../model/utils/step-utils";
 
 let loginPage: LoginPage;
 let newProductPage: NewProductPage
@@ -33,19 +35,38 @@ test.afterAll(async ({ request }) => {
 
 test("Verify create new product", async ({ page, request }) => {
     const random = new Date().getTime();
-    let requestBody = newProductBodyTemplate;
-    requestBody.name = `${requestBody.name} ${random}`;
-    requestBody.sku = `${requestBody.sku} ${random}`;
-    requestBody.url_key = `${requestBody.url_key}_${random}`;
-    let response  = await dashboardPage.createProductByApi(requestBody, cookieHeader);
-    expect(response).toBeOK();
-    let responseBody = await response.json();
-    productIds.push(responseBody.data.uuid)
-    let productName = requestBody.name;
-    await newProductPage.clickMenuByLabel('Products');
-    productsPage.isDisplay();
-    await productsPage.searchProduct(random.toString());
-    await productsPage.selectProductByName(productName);
-    await editProductPage.isDisplay(`Editing ${productName}`);
-    await expect(await editProductPage.getFieldValueByLabel('Product Name')).toEqual(productName);
+    let productName = "";
+
+    await iStep("Create product by API", async () => {
+        let requestBody = newProductBodyTemplate;
+        requestBody.name = `${requestBody.name} ${random}`;
+        requestBody.sku = `${requestBody.sku} ${random}`;
+        requestBody.url_key = `${requestBody.url_key}_${random}`;
+        let response = await dashboardPage.createProductByApi(requestBody, cookieHeader);
+        expect(response).toBeOK();
+        let responseBody = await response.json();
+        productIds.push(responseBody.data.uuid)
+        productName = requestBody.name;
+    })
+    // await allure.step("Create product by API", async () => {
+
+    // });
+    await allure.step("View Product", async () => {
+        await newProductPage.clickMenuByLabel('Products');
+        productsPage.isDisplay();
+    });
+
+    await allure.step("Search Product", async () => {
+        await productsPage.searchProduct(random.toString());
+    });
+
+    await allure.step("View Product", async () => {
+        await productsPage.selectProductByName(productName);
+        await editProductPage.isDisplay(`Editing ${productName}`);
+    });
+
+    await allure.step("Verify Product", async () => {
+        await expect(await editProductPage.getFieldValueByLabel('Product Name')).toEqual(productName);
+    });
+
 });
