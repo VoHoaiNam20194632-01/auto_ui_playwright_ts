@@ -6,7 +6,7 @@
   "scripts": {
     "test-local": "npx playwright test tests/evershop",
     "test-stg": "cross-env TEST_ENV=stg npx playwright test tests/evershop",
-    "generate-report": "npx allure awesome --single-file allure-results"
+    "generate-report": "cross-env npx allure awesome --single-file allure-results"
   },
   "keywords": [],
   "author": "",

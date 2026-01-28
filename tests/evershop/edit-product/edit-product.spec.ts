@@ -1,4 +1,5 @@
-import { test, expect, Page } from "@playwright/test";
+import {  expect, Page } from "@playwright/test";
+import { test } from "../../../model/utils/fixtures.ts";
 import { LoginPage } from "../../../model/pages/login-page";
 import { NewProductPage } from "../../../model/pages/new-product-page";
 import { DashboardPage } from "../../../model/pages/dashboard-page";
@@ -66,7 +67,7 @@ test("Verify create new product", async ({ page, request }) => {
     });
 
     await allure.step("Verify Product", async () => {
-        await expect(await editProductPage.getFieldValueByLabel('Product Name')).toEqual(productName);
+        await expect(await editProductPage.getFieldValueByLabel('ProductName')).toEqual(productName);
     });
 
 });
